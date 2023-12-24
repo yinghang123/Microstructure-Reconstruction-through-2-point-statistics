@@ -7,7 +7,7 @@ import cv2
 from HelperFunctions_StochasticGeneration import *
 import time
 
-"""using the """
+"""using the preprocessing to clean up, and generate from 2-pt stat"""
 
 
 def dis3d(a, b):
@@ -95,7 +95,7 @@ def db_cluster(img):
     for i in range(len(labels)):
         k[labels[i]] += 1
     print(k)'''
-    print('dbscan clustering over')
+    print('dbscan clustering over, the microstructure now is in label form')
     labels = np.reshape(labels, (height, width))
     return labels, centernumber, center_of_euler
 
@@ -137,8 +137,8 @@ img = cv2.imread('original_voronoi_ild.tif')
 
 
 labels, cluster_number, euler_cluster_center = db_cluster(img)
-print('dbscan cluster number', cluster_number)
-print('labels shape',labels.shape)
+print('dbscan cluster number (i.e. numbers of variants considered)', cluster_number)
+print('labels shape (picture shape)',labels.shape)
 
 ########### convert euler angle to ipfcolor ############
 grain_ave_ipf = []
@@ -152,7 +152,7 @@ for i in range(len(euler_cluster_center)):
     grain_ave_ipf.append([ipfcolor[min_index][2], ipfcolor[min_index][1], ipfcolor[min_index][0]])
 
 center = grain_ave_ipf
-print(center)
+print('ipf center:', center)
 np.save('centercolor.npy', center) ### 是欧拉中心所对应的ipf中心颜色
 #center = euler_cluster_center
 ### Clustered the original image
@@ -162,7 +162,7 @@ for i in range(labels.shape[0]):
         img[i][j][0] = cur_color[0]
         img[i][j][1] = cur_color[1]
         img[i][j][2] = cur_color[2]
-cv2.imshow('img_origin_voronoi', img)
+cv2.imshow('img_origin_voronoi', img) # this image has been clustered for further generation
 cv2.waitKey(0)
 cv2.imwrite('original_voronoi_cluster.tif', img)
 
@@ -173,7 +173,7 @@ for i in range(labels.shape[0]):
     for j in range(labels.shape[1]):
         number = labels[i][j]
         k[number] += 1
-print(k)
+print('number of each cluster pixels',k)
 original_color_fraction = np.c_[center, k]
 np.save('original_color_fraction.npy', original_color_fraction)
 
@@ -195,7 +195,7 @@ if change_or_not:
 start = time.perf_counter()
 eignmicro = generate_eignmicro(labels)
 struct = np.array(eignmicro, dtype=np.float64)
-generator = EigenGenerator_BaseClass
+generator = EigenGenerator_BaseClass  # generate microstructure through 2pt stats
 stats = twopointstats(struct)
 sum1 = stats.sum()
 print('sum1',sum1)
@@ -287,5 +287,5 @@ print('generating time', end-start, 'seconds')
 
 cv2.imshow('img', img) ######################## You can import it into aztech to analyze the center and growth vectors and then use anisotropic voronoi to de-isolate it.
 cv2.waitKey(0)
-cv2.imwrite('kali_gen.tif', img)
+cv2.imwrite('kali_gen.tif', img) # this is the generated microstructure but need post processing
 
