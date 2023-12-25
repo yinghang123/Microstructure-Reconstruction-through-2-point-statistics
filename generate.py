@@ -1,7 +1,6 @@
 import time
 import cv2
-from statistically_similar_generator import db_cluster, generate_eignmicro
-import numpy as np
+from PreprocessingFunction_2 import db_cluster, generate_eignmicro
 from HelperFunctions_StochasticGeneration import *
 from StochasticGeneration2 import *
 
