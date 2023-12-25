@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-from statistically_similar_generator import db_cluster, dis3d
+from PreprocessingFunction_2 import db_cluster, dis3d
 
 "Establishing the linkage of color---euler angle, for visualization generating input file for Crystal plasticity model"
 
@@ -15,7 +15,9 @@ for i in range(ipfcolor.shape[0]):
 
 img = cv2.imread('original_voronoi_ild.tif') # this is the input microstructure, the color of it is based on euler angle (needing further regulation)
 labels, cluster_number, euler_cluster_center = db_cluster(img)
+
 ########### convert euler angle to ipfcolor ############
+
 grain_ave_ipf = []
 print('convert euler angle to ipfcolor')
 for i in range(len(euler_cluster_center)):
@@ -30,6 +32,4 @@ center = grain_ave_ipf
 print('ipf center:', center)
 np.save('centercolor.npy', center) ### 是欧拉中心所对应的ipf中心颜色 average ipf color of a grain
 print('successful generation of color file')
-
-
 
